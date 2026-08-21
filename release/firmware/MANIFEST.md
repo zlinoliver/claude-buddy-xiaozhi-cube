@@ -5,10 +5,13 @@ App version **v0.3.0** · ESP-IDF v5.5.2 · board `shuzhi-1.54tft-4g`
 > **The `.bin` files are published on the [GitHub Releases page](../../../../releases/latest), not in the repo.**
 > Download them there. This folder keeps only the docs and the web-installer manifest.
 
-| File (on the Releases page) | Flash at | Use |
+👉 **Almost everyone wants the `merged` file, flashed at `0x0`.** The `app` file is a
+developer convenience only.
+
+| File (on the Releases page) | Flash at | Who / when |
 |------|----------|-----|
-| `shuzhi-1.54tft-4g-buddy-v0.3.0-merged-8MB.bin` | `0x0` | **Easiest** — single full image (bootloader + partition table + otadata + app). Use this for a first install / web flasher / M5Burner. |
-| `shuzhi-1.54tft-4g-buddy-v0.3.0-app.bin` | `0x20000` | App only — for devices that already run this project (updates the app partition). |
+| ⭐ `shuzhi-1.54tft-4g-buddy-v0.3.0-merged-8MB.bin` | `0x0` | **Everyone — first install or reflash.** Complete image (bootloader + partition table + otadata + app). Works with the web flasher / M5Burner. |
+| `shuzhi-1.54tft-4g-buddy-v0.3.0-app.bin` | `0x20000` | **Developers only** — update just the app on a device already running this firmware (keeps NVS/pairing). |
 | `manifest.json` (in this folder) | — | [ESP Web Tools](https://esphome.github.io/esp-web-tools/) manifest for a one-click browser flasher. |
 
 ## SHA-256

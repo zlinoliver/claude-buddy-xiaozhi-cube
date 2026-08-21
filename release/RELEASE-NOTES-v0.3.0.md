@@ -4,15 +4,25 @@ First public release. Turns the commercial **小智 / XiaoZhi "CUBE" 1.54″ TFT
 puck (ESP32-S3, board `shuzhi-1.54tft-4g`) into a **Claude Desktop companion**:
 approve/deny Claude's tool requests with a physical button, over Bluetooth LE.
 
-## Flash
-Easiest: the browser flasher at <https://espressif.github.io/esptool-js/> — connect
-over USB and flash the merged image at address `0x0`. Beginner guide:
-[release/FLASH-GUIDE.md](FLASH-GUIDE.md).
+## Which file? (almost everyone: the first one)
+👉 **Just download `shuzhi-1.54tft-4g-buddy-v0.3.0-merged-8MB.bin` and flash it at `0x0`.**
+That's the complete firmware. The `-app.bin` is only for developers updating an
+existing install — ignore it if you're unsure.
 
-| File | Offset | Use |
-|------|--------|-----|
-| `shuzhi-1.54tft-4g-buddy-v0.3.0-merged-8MB.bin` | `0x0` | First install / web flasher / M5Burner |
-| `shuzhi-1.54tft-4g-buddy-v0.3.0-app.bin` | `0x20000` | App-only update |
+| File | Flash at | Who / when |
+|------|----------|-----------|
+| ⭐ `shuzhi-1.54tft-4g-buddy-v0.3.0-merged-8MB.bin` | `0x0` | **Everyone — first install or reflash.** Complete image (bootloader + partitions + app). |
+| `shuzhi-1.54tft-4g-buddy-v0.3.0-app.bin` | `0x20000` | Developers only — update just the app on a device already running this firmware. |
+
+## How to flash (≈3 min, no install)
+1. Open **<https://espressif.github.io/esptool-js/>** in **Chrome or Edge**.
+2. Plug the device into USB, click **Connect**, pick the serial port.
+3. Set Flash Address `0x0`, choose the **merged** `.bin`, click **Program**.
+4. When it finishes, unplug/replug USB (or press the power button) to reboot.
+5. Pair from Claude Desktop → *Hardware Buddy* → enter the passkey shown on the device.
+
+Full step-by-step (command line, M5Burner, pairing recovery):
+[release/FLASH-GUIDE.md](FLASH-GUIDE.md).
 
 ## Highlights
 - 🔋 On-screen **battery %** (calibrated voltage → Li-ion curve)
