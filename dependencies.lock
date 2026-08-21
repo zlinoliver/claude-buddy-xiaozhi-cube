@@ -1,0 +1,212 @@
+dependencies:
+  78/xiaozhi-fonts:
+    component_hash: 19ee829a7439702e18084a313b7b86017d3b8d17a094684575edc76bb6d11023
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.3'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.6.0
+  espressif/button:
+    component_hash: 95babe831403e301511a22a4dfcd599abcf32cf72c7f8ac5352a61662363c9ea
+    dependencies:
+    - name: espressif/cmake_utilities
+      registry_url: https://components.espressif.com
+      require: private
+      version: '*'
+    - name: idf
+      require: private
+      version: '>=4.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 4.1.7
+  espressif/cmake_utilities:
+    component_hash: 351350613ceafba240b761b4ea991e0f231ac7a9f59a9ee901f751bddc0bb18f
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.1'
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    version: 0.5.3
+  espressif/esp_codec_dev:
+    component_hash: 896c67360ae1f8dedaf8a53dfe48c015317fa455f061a5165307892296990028
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.5.10
+  espressif/esp_io_expander:
+    component_hash: 7b7f91270172e46ca4597e3874f48d8412e280e8c295559f5922ec38656e3e5f
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.4.2'
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    version: 1.2.1
+  espressif/esp_io_expander_tca9554:
+    component_hash: ee94a439ade1c17129a491efe572c600899306a2ffadbde491852d95333e28b4
+    dependencies:
+    - name: espressif/esp_io_expander
+      registry_url: https://components.espressif.com
+      require: public
+      version: ^1.2.0
+    - name: idf
+      require: private
+      version: '>=5.2'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 2.0.3
+  espressif/esp_lcd_gc9a01:
+    component_hash: 09ddc8f5c9d718a659ffa30a4040e1ae75077e68492c38aec8c2beaaa7b3a9bc
+    dependencies:
+    - name: espressif/cmake_utilities
+      registry_url: https://components.espressif.com
+      require: private
+      version: 0.*
+    - name: idf
+      require: private
+      version: '>=4.4'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 2.0.1
+  espressif/esp_lcd_ili9341:
+    component_hash: 31f1b793aa2110dd2ae071c21ccbff0a4eb20d9a4ee40b6294c0dc0ad9552c4e
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.4'
+    - name: espressif/cmake_utilities
+      registry_url: https://components.espressif.com
+      require: private
+      version: 0.*
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.2.0
+  espressif/esp_lcd_sh8601:
+    component_hash: 18245cd23204eefb67f61b362405f78364fa13b13cdedda5f7546d89701c506b
+    dependencies:
+    - name: espressif/cmake_utilities
+      registry_url: https://components.espressif.com
+      require: private
+      version: 0.*
+    - name: idf
+      require: private
+      version: '>=5.3'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 2.0.1~1
+  espressif/esp_lcd_st77916:
+    component_hash: 5fa0f8b1274576d4484e2b8d9358e2a5d09c721511bef0dce6a55b4206b5f0e9
+    dependencies:
+    - name: espressif/cmake_utilities
+      registry_url: https://components.espressif.com
+      require: private
+      version: 0.*
+    - name: idf
+      require: private
+      version: '>5.0.4,!=5.1.1'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.0.1
+  espressif/esp_lcd_touch:
+    component_hash: 3f85a7d95af876f1a6ecca8eb90a81614890d0f03a038390804e5a77e2caf862
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=4.4.2'
+    source:
+      registry_url: https://components.espressif.com
+      type: service
+    version: 1.2.1
+  espressif/esp_lcd_touch_ft5x06:
+    component_hash: 8ae101b4a321b6327d98751b049e3c7fff2718ad04d676259369ff85d4edbcdf
+    dependencies:
+    - name: espressif/esp_lcd_touch
+      registry_url: https://components.espressif.com
+      require: public
+      version: ^1.2.0
+    - name: idf
+      require: private
+      version: '>=5.2'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.1.0~1
+  espressif/esp_lvgl_port:
+    component_hash: b6360960f47b6776462e7092861b3ea66477ffb762a01baa0aecbb3d74cd50f4
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.1'
+    - name: lvgl/lvgl
+      registry_url: https://components.espressif.com
+      require: public
+      version: '>=8,<10'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 2.7.2
+  espressif/led_strip:
+    component_hash: 28621486f77229aaf81c71f5e15d6fbf36c2949cf11094e07090593e659e7639
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 3.0.3
+  idf:
+    source:
+      type: idf
+    version: 5.5.2
+  joltwallet/littlefs:
+    component_hash: 01faa388c6305fe77fd6962cda6171e753033458f24f8fae9e9d932e3d817a4c
+    dependencies:
+    - name: idf
+      require: private
+      version: '>=5.0'
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 1.22.1
+  lvgl/lvgl:
+    component_hash: 184e532558c1c45fefed631f3e235423d22582aafb4630f3e8885c35281a49ae
+    dependencies: []
+    source:
+      registry_url: https://components.espressif.com/
+      type: service
+    version: 9.5.0
+direct_dependencies:
+- 78/xiaozhi-fonts
+- espressif/button
+- espressif/esp_codec_dev
+- espressif/esp_io_expander_tca9554
+- espressif/esp_lcd_gc9a01
+- espressif/esp_lcd_ili9341
+- espressif/esp_lcd_sh8601
+- espressif/esp_lcd_st77916
+- espressif/esp_lcd_touch_ft5x06
+- espressif/esp_lvgl_port
+- espressif/led_strip
+- idf
+- joltwallet/littlefs
+- lvgl/lvgl
+manifest_hash: 096c954681e767c833d6cdf9b91b0afa7f598d9fda8a00c488210e5c8866ba77
+target: esp32s3
+version: 2.0.0

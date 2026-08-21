@@ -1,0 +1,15 @@
+# shuzhi-1.54tft-4g: 8MB flash, 8MB Octal PSRAM (ESP32-S3R8)
+CONFIG_BOARD_TYPE_SHUZHI_154TFT_4G=y
+CONFIG_ESPTOOLPY_FLASHSIZE_8MB=y
+CONFIG_PARTITION_TABLE_CUSTOM_FILENAME="partitions/v2/8m.csv"
+CONFIG_SPIRAM=y
+CONFIG_SPIRAM_MODE_OCT=y
+CONFIG_SPIRAM_SPEED_80M=y
+
+# Power saving: DFS + automatic light sleep (see main.cc esp_pm_configure),
+# and BLE controller modem sleep so the radio duty-cycles while staying
+# connected. Light sleep self-gates behind the backlight/BLE PM locks.
+CONFIG_PM_ENABLE=y
+CONFIG_FREERTOS_USE_TICKLESS_IDLE=y
+CONFIG_BT_CTRL_MODEM_SLEEP=y
+CONFIG_BT_CTRL_MODEM_SLEEP_MODE_1=y

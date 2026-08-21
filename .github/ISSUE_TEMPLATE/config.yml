@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Claude Desktop Buddy Protocol
+    url: https://github.com/anthropics/claude-desktop-buddy/blob/main/REFERENCE.md
+    about: BLE wire protocol specification
+  - name: xiaozhi-esp32 Hardware Ecosystem
+    url: https://github.com/78/xiaozhi-esp32
+    about: Board abstraction layer and 100+ hardware variants

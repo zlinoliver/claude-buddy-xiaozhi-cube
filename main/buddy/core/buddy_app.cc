@@ -1,0 +1,309 @@
+#include "buddy_app.h"
+#include "protocol_handler.h"
+#include "demo_mode.h"
+#include "../ble/nus_service.h"
+#include "../ui/buddy_ui.h"
+#include "../ui/buddy_touch.h"
+#include "../storage/buddy_nvs.h"
+#include "../pet/buddy_pet.h"
+#include "../pet/gif_character.h"
+
+#include <esp_log.h>
+#include <esp_mac.h>
+#include <cstring>
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+
+#include "boards/common/board.h"
+#include "display/display.h"
+
+#define TAG "buddy"
+
+static BuddyApp s_instance;
+
+BuddyApp& BuddyApp::GetInstance() {
+    return s_instance;
+}
+
+static uint32_t now_ms() {
+    return (uint32_t)(xTaskGetTickCount() * portTICK_PERIOD_MS);
+}
+
+void BuddyApp::Initialize() {
+    ESP_LOGI(TAG, "Initializing Claude Desktop Buddy");
+
+    auto& board = Board::GetInstance();
+
+    // Load persistent stats
+    buddy_nvs_init();
+    buddy_nvs_load_stats(&stats_);
+    buddy_nvs_load_settings(&settings_);
+    ESP_LOGI(TAG, "Stats: approvals=%d denials=%d level=%d tokens=%lu",
+             stats_.approvals, stats_.denials, stats_.level,
+             (unsigned long)stats_.tokens);
+
+    // Apply persisted display/audio settings
+    auto* backlight = Board::GetInstance().GetBacklight();
+    if (backlight) backlight->SetBrightness((settings_.brightness * 100) / 255);
+    auto* init_buzzer = Board::GetInstance().GetBuzzer();
+    if (init_buzzer) init_buzzer->SetVolume(settings_.volume);
+
+    buddy_pet_init();
+    uint8_t species = buddy_nvs_load_species();
+    if (species < buddy_pet_species_count()) {
+        buddy_pet_set_species(species);
+    }
+
+    uint8_t mac[6];
+    esp_read_mac(mac, ESP_MAC_BT);
+    char ble_name[32];
+    snprintf(ble_name, sizeof(ble_name), "%s-%02X%02X",
+             CONFIG_BUDDY_DEVICE_NAME_PREFIX, mac[4], mac[5]);
+
+    nus_init(ble_name);
+    protocol_init();
+    state_.reset();
+
+    buddy_ui_init();
+
+    if (board.HasTouchScreen()) {
+        buddy_touch_init(nullptr);
+        ESP_LOGI(TAG, "Touch screen enabled");
+    }
+
+    // Try loading a previously installed GIF character
+    if (gif_character_init()) {
+        ESP_LOGI(TAG, "GIF character loaded from LittleFS");
+    }
+
+    ESP_LOGI(TAG, "Buddy initialized, advertising as '%s'", ble_name);
+}
+
+void BuddyApp::Run() {
+    auto* backlight = Board::GetInstance().GetBacklight();
+
+    uint32_t last_passkey = 0;
+    uint32_t last_energy_decay = now_ms();
+    last_activity_ms_ = now_ms();
+    char last_prompt_id[sizeof(state_.prompt_id)] = {0};
+
+    while (true) {
+        // Demo mode overrides protocol, but auto-exit when BLE data arrives
+        if (demo_mode_active()) {
+            if (nus_available()) {
+                demo_mode_stop();
+                protocol_poll(&state_);
+            } else {
+                demo_mode_tick();
+            }
+        } else {
+            protocol_poll(&state_);
+        }
+        UpdatePersona();
+
+        // Turn event → brief BUSY animation pulse
+        static uint16_t last_turn = 0;
+        if (state_.turn_count != last_turn) {
+            last_turn = state_.turn_count;
+            if (one_shot_until_ == 0) {
+                one_shot_state_ = PersonaState::BUSY;
+                one_shot_until_ = now_ms() + 500;
+            }
+        }
+
+        // Detect prompt transitions by id (not just present/absent). Back-to-back
+        // requests replace id A directly with id B without ever clearing, so we
+        // must re-arm approve/deny whenever the id changes — otherwise the second
+        // and later prompts stay stuck on "Sent!" and the buttons do nothing.
+        if (strcmp(state_.prompt_id, last_prompt_id) != 0) {
+            strncpy(last_prompt_id, state_.prompt_id, sizeof(last_prompt_id) - 1);
+            last_prompt_id[sizeof(last_prompt_id) - 1] = '\0';
+            approval_sent_ = false;  // re-arm for the new (or cleared) prompt
+            auto* led = Board::GetInstance().GetLed();
+            if (state_.has_prompt()) {
+                // A new request arrived (fresh, or replacing a just-answered one).
+                prompt_start_ms_ = now_ms();
+                NotifyActivity();  // wake/keep the screen lit for the new request
+                if (led) led->StartContinuousBlink(500);
+                auto* buzzer = Board::GetInstance().GetBuzzer();
+                if (buzzer && settings_.sound) buzzer->AttentionTone();
+            } else {
+                if (led) led->TurnOff();
+            }
+        }
+
+        // Update token-based stats from heartbeat
+        if (state_.connected && state_.tokens_today > 0) {
+            stats_.tokens = state_.tokens_today;
+            stats_.update_fed();
+            uint8_t new_level = (uint8_t)(stats_.tokens / 50000);
+            if (new_level > stats_.level) {
+                stats_.level = new_level;
+                one_shot_state_ = PersonaState::CELEBRATE;
+                one_shot_until_ = now_ms() + 3000;
+                auto* buzzer = Board::GetInstance().GetBuzzer();
+                if (buzzer && settings_.sound) buzzer->CelebrateMelody();
+                buddy_nvs_save_stats(&stats_);
+            }
+        }
+
+        // Energy decay: -1 every 2 hours
+        if (now_ms() - last_energy_decay > 7200000) {
+            if (stats_.energy > 0) stats_.energy--;
+            last_energy_decay = now_ms();
+        }
+
+        // Handle passkey display
+        uint32_t pk = nus_passkey();
+        if (pk != last_passkey) {
+            if (pk != 0) {
+                buddy_ui_show_passkey(pk);
+            } else {
+                buddy_ui_hide_passkey();
+            }
+            last_passkey = pk;
+        }
+
+        // Update main UI
+        if (pk == 0) {
+            buddy_ui_update(state_, active_state_, approval_sent_);
+            buddy_touch_update(state_.has_prompt(), approval_sent_);
+        }
+
+        // Battery indicator (refresh every 5s; cheap and harmless when screen off)
+        static uint32_t last_batt_ms = 0;
+        if (now_ms() - last_batt_ms > 5000) {
+            last_batt_ms = now_ms();
+            int blevel = 0;
+            bool bcharging = false, bdischarging = false;
+            bool ok = Board::GetInstance().GetBatteryLevel(blevel, bcharging, bdischarging);
+            buddy_ui_set_battery(blevel, bcharging, ok);
+        }
+
+        // IMU: shake detection → dizzy one-shot
+        auto* imu = Board::GetInstance().GetImu();
+        if (imu) {
+            float ax, ay, az;
+            if (imu->GetAccelData(ax, ay, az)) {
+                float mag = ax * ax + ay * ay + az * az;
+                if (mag > 4.0f) {  // ~2g threshold
+                    one_shot_state_ = PersonaState::DIZZY;
+                    one_shot_until_ = now_ms() + 2000;
+                }
+                // Face-down nap detection (z < -0.7g)
+                if (az < -0.7f && ax < 0.4f && ay < 0.4f) {
+                    if (stats_.energy < 5) stats_.energy = 5;
+                }
+            }
+        }
+
+        // Screen brightness policy (silent mode):
+        //  - notification / approval prompt / passkey -> wake to full brightness
+        //  - button press -> NotifyActivity() also wakes to full
+        //  - merely being BLE-connected does NOT wake the screen: it dims, but
+        //    the link stays up so incoming activity still reaches the device
+        //  - after the idle timeout, hold a low "always-on" floor so the pet and
+        //    battery stay visible. Set BUDDY_SCREEN_IDLE_PCT to 0 for an eco
+        //    screen-off mode (which also lets the SoC enter true light sleep).
+        static constexpr uint8_t BUDDY_SCREEN_IDLE_PCT = 5;
+        if (state_.has_prompt() || pk != 0) {
+            last_activity_ms_ = now_ms();
+        }
+        if (backlight) {
+            uint32_t idle_ms = now_ms() - last_activity_ms_;
+            if (idle_ms > CONFIG_BUDDY_SCREEN_OFF_MS) {
+                backlight->SetBrightness(BUDDY_SCREEN_IDLE_PCT);
+            } else {
+                backlight->RestoreBrightness();
+            }
+        }
+
+        vTaskDelay(pdMS_TO_TICKS(50));
+    }
+}
+
+void BuddyApp::UpdatePersona() {
+    base_state_ = persona_derive(state_);
+
+    uint32_t now = now_ms();
+    if (one_shot_until_ > 0 && now < one_shot_until_) {
+        active_state_ = one_shot_state_;
+    } else {
+        one_shot_until_ = 0;
+        active_state_ = base_state_;
+    }
+}
+
+void BuddyApp::Approve() {
+    NotifyActivity();
+    if (!state_.has_prompt() || approval_sent_) return;
+    protocol_send_permission(state_.prompt_id, "once");
+    approval_sent_ = true;
+
+    stats_.approvals++;
+
+    // Record response time
+    uint32_t response_ms = now_ms() - prompt_start_ms_;
+    uint8_t response_sec = (response_ms > 255000) ? 255 : (uint8_t)(response_ms / 1000);
+    stats_.record_velocity(response_sec);
+    stats_.update_mood();
+
+    buddy_nvs_save_stats(&stats_);
+
+    auto* led = Board::GetInstance().GetLed();
+    if (led) led->BlinkOnce();
+
+    auto* buzzer = Board::GetInstance().GetBuzzer();
+    if (buzzer && settings_.sound) buzzer->Beep();
+
+    one_shot_state_ = PersonaState::HEART;
+    one_shot_until_ = now_ms() + 2000;
+
+    ESP_LOGI(TAG, "Approved: %s (total approvals: %d)", state_.prompt_id, stats_.approvals);
+}
+
+void BuddyApp::Deny() {
+    NotifyActivity();
+    if (!state_.has_prompt() || approval_sent_) return;
+    protocol_send_permission(state_.prompt_id, "deny");
+    approval_sent_ = true;
+
+    stats_.denials++;
+    stats_.update_mood();
+    buddy_nvs_save_stats(&stats_);
+
+    auto* led = Board::GetInstance().GetLed();
+    if (led) led->Blink(2, 200);
+
+    auto* buzzer = Board::GetInstance().GetBuzzer();
+    if (buzzer && settings_.sound) buzzer->DoubleBeep();
+
+    ESP_LOGI(TAG, "Denied: %s (total denials: %d)", state_.prompt_id, stats_.denials);
+}
+
+void BuddyApp::OnButtonClick() {
+    NotifyActivity();
+
+    if (state_.has_prompt() && !approval_sent_) {
+        Approve();
+    }
+}
+
+void BuddyApp::OnButtonLongPress() {
+    NotifyActivity();
+
+    if (state_.has_prompt() && !approval_sent_) {
+        Deny();
+    }
+}
+
+void BuddyApp::NotifyActivity() {
+    last_activity_ms_ = now_ms();
+    auto* backlight = Board::GetInstance().GetBacklight();
+    if (backlight) backlight->RestoreBrightness();
+}
+
+bool BuddyApp::IsScreenOff() const {
+    uint32_t idle_ms = (uint32_t)(xTaskGetTickCount() * portTICK_PERIOD_MS) - last_activity_ms_;
+    return idle_ms > CONFIG_BUDDY_SCREEN_OFF_MS;
+}

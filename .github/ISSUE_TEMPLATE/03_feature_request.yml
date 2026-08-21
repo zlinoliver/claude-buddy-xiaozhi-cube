@@ -1,0 +1,30 @@
+name: Feature request
+description: Suggest a new feature or board support
+labels: ['enhancement']
+body:
+  - type: dropdown
+    id: type
+    attributes:
+      label: Request type
+      options:
+        - New board support
+        - New pet species
+        - UI improvement
+        - Protocol feature
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What would you like to see?
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Additional context
+      description: Hardware details, screenshots, links, etc.

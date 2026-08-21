@@ -1,0 +1,13 @@
+{
+  "name": "Claude Desktop Buddy — Shuzhi 1.54\" TFT 4G",
+  "version": "0.3.0",
+  "new_install_prompt_erase": true,
+  "builds": [
+    {
+      "chipFamily": "ESP32-S3",
+      "parts": [
+        { "path": "shuzhi-1.54tft-4g-buddy-v0.3.0-merged-8MB.bin", "offset": 0 }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,34 @@
+name: Runtime bug
+description: Device connected but something isn't working right
+labels: ['bug']
+body:
+  - type: dropdown
+    id: board
+    attributes:
+      label: Board
+      options:
+        - movecall-cuican-esp32s3
+        - movecall-moji-esp32s3
+        - movecall-moji2-esp32c5
+        - Other (specify below)
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: What happened? What did you expect?
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Serial log
+      render: shell
