@@ -36,19 +36,14 @@
 
 ## 🔌 支持的硬件
 
+本项目**只为一款设备定制并测试过**——商用的**小智 / XiaoZhi "CUBE" 1.54″ TFT (4G)**:
+
 | 板子 | 芯片 | 屏幕 | 预编译固件 |
 |-------|------|---------|:---:|
 | **shuzhi-1.54tft-4g**（小智 CUBE 4G） | ESP32-S3 | ST7789 240×240 | ✅ [Releases](../../releases/latest) |
-| movecall-cuican-esp32s3 | ESP32-S3 | GC9A01 240×240 圆屏 | 自行编译 |
-| movecall-moji-esp32s3 | ESP32-S3 | GC9A01 240×240 圆屏 | 自行编译 |
-| movecall-moji2-esp32c5 | ESP32-C5 | ST77916 360×360 圆屏 | 自行编译 |
-| movecall-mohi-esp32c3 | ESP32-C3 | ST7789 160×80 | 自行编译 |
-| atk-dnesp32s3-box0 | ESP32-S3 | ST7789 240×240 | 自行编译 |
-| magiclick-2p5 | ESP32-S3 | GC9107 128×128 | 自行编译 |
-| m5stack-core-s3 | ESP32-S3 | ILI9341 320×240 触摸 | 自行编译 |
 
-板级抽象（来自 xiaozhi-esp32）支持 100+ 种硬件，移植见
-[docs/ADDING_A_BOARD.md](docs/ADDING_A_BOARD.md)。
+> `main/boards/` 里还保留着从 [xiaozhi-esp32](https://github.com/78/xiaozhi-esp32)
+> 继承来的其他板级定义，但**本项目未测试、不支持**——本固件只针对小智 CUBE 4G。
 
 ## 🚀 快速上手
 
