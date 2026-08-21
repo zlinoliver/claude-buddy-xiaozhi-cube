@@ -5,7 +5,8 @@ cmake_minimum_required(VERSION 3.16)
 # Add this line to disable the specific warning
 add_compile_options(-Wno-missing-field-initializers)
 
-# Board-specific sdkconfig: -DBOARD=movecall-cuican-esp32s3
+# Single board: sdkconfig.defaults already selects shuzhi-1.54tft-4g.
+# -DBOARD=shuzhi-1.54tft-4g is still honoured (appends its sdkconfig.board) but optional.
 set(SDKCONFIG_DEFAULTS "sdkconfig.defaults")
 if(DEFINED BOARD)
     set(BOARD_SDKCONFIG "${CMAKE_SOURCE_DIR}/main/boards/${BOARD}/sdkconfig.board")

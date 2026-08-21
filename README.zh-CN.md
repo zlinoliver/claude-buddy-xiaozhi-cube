@@ -42,8 +42,7 @@
 |-------|------|---------|:---:|
 | **shuzhi-1.54tft-4g**（小智 CUBE 4G） | ESP32-S3 | ST7789 240×240 | ✅ [Releases](../../releases/latest) |
 
-> `main/boards/` 里还保留着从 [xiaozhi-esp32](https://github.com/78/xiaozhi-esp32)
-> 继承来的其他板级定义，但**本项目未测试、不支持**——本固件只针对小智 CUBE 4G。
+> 基于 [xiaozhi-esp32](https://github.com/78/xiaozhi-esp32) 的板级框架，已精简为只保留这一款设备。
 
 ## 🚀 快速上手
 
@@ -59,10 +58,9 @@
 首次编译会自动下载依赖组件。
 ```bash
 . ~/esp/esp-idf/export.sh
-idf.py -DBOARD=shuzhi-1.54tft-4g set-target esp32s3
-idf.py -DBOARD=shuzhi-1.54tft-4g build flash monitor
+idf.py set-target esp32s3
+idf.py build flash monitor
 ```
-其他板子把 `-DBOARD=` 换成对应名字（见上表）。
 
 ## 🔗 与 Claude Desktop 配对
 1. 在 Claude Desktop 打开 **Hardware Buddy & Maker Devices** 面板（必要时先开 Developer Mode）。
@@ -117,7 +115,6 @@ main/
 - **[release/README.md](release/README.md)** —— 烧录 / 发布包说明。
 - **[SHUZHI-1.54TFT-4G-HARDWARE.md](SHUZHI-1.54TFT-4G-HARDWARE.md)** —— 完整的硬件逆向参考
   （引脚图、电量 ADC、BLE 修复、省电机制内幕）。
-- **[docs/ADDING_A_BOARD.md](docs/ADDING_A_BOARD.md)** —— 移植到新板子。
 
 ## ⚖️ 许可与免责声明
 MIT，见 [LICENSE](LICENSE)。本项目为独立的社区项目，**与 Anthropic、设备厂商、M5Stack

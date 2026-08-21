@@ -1,45 +1,13 @@
 menu "Claude Desktop Buddy"
 
-choice BOARD_TYPE
-    prompt "Board Type"
-    default BOARD_TYPE_MOVECALL_CUICAN_ESP32S3
+# This firmware targets a single device: the XiaoZhi "CUBE" 1.54" TFT 4G.
+config BOARD_TYPE_SHUZHI_154TFT_4G
+    bool
+    default y
+    depends on IDF_TARGET_ESP32S3
     help
-        Select the target hardware board.
-
-    config BOARD_TYPE_MOVECALL_CUICAN_ESP32S3
-        bool "Movecall CuiCan (ESP32-S3, GC9A01 240x240)"
-        depends on IDF_TARGET_ESP32S3
-    config BOARD_TYPE_MOVECALL_MOJI_ESP32S3
-        bool "Movecall Moji (ESP32-S3, GC9A01 240x240)"
-        depends on IDF_TARGET_ESP32S3
-    config BOARD_TYPE_MOVECALL_MOJI2_ESP32C5
-        bool "Movecall Moji2 (ESP32-C5, ST77916 360x360)"
-        depends on IDF_TARGET_ESP32C5
-    config BOARD_TYPE_MOVECALL_MOHI_ESP32C3
-        bool "Movecall MoHi (ESP32-C3, ST7789 160x80)"
-        depends on IDF_TARGET_ESP32C3
-    config BOARD_TYPE_ESP_BOX_3
-        bool "Espressif ESP-BOX-3 (ESP32-S3, ILI9341 320x240)"
-        depends on IDF_TARGET_ESP32S3
-    config BOARD_TYPE_M5STACK_CORE_S3
-        bool "M5Stack CoreS3 (ESP32-S3, ILI9341 320x240 Touch)"
-        depends on IDF_TARGET_ESP32S3
-    config BOARD_TYPE_LILYGO_T_CIRCLE_S3
-        bool "LILYGO T-Circle-S3 (ESP32-S3, GC9D01N 160x160)"
-        depends on IDF_TARGET_ESP32S3
-    config BOARD_TYPE_WAVESHARE_AMOLED_1_8
-        bool "Waveshare ESP32-S3-Touch-AMOLED-1.8 (368x448)"
-        depends on IDF_TARGET_ESP32S3
-    config BOARD_TYPE_ATK_DNESP32S3_BOX0
-        bool "ATK-DNESP32S3-BOX0 (ESP32-S3, ST7789 240x240)"
-        depends on IDF_TARGET_ESP32S3
-    config BOARD_TYPE_MAGICLICK_2P5
-        bool "Magiclick 2P5 (ESP32-S3, GC9107 128x128)"
-        depends on IDF_TARGET_ESP32S3
-    config BOARD_TYPE_SHUZHI_154TFT_4G
-        bool "Shuzhi 1.54TFT 4G (ESP32-S3, ST7789 240x240)"
-        depends on IDF_TARGET_ESP32S3
-endchoice
+        Target board: Shuzhi 1.54" TFT 4G (小智 / XiaoZhi CUBE 4G) —
+        ESP32-S3, ST7789 240x240. This firmware is customized for this device only.
 
 config BUDDY_DEVICE_NAME_PREFIX
     string "BLE device name prefix"

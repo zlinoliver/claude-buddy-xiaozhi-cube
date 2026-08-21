@@ -45,9 +45,8 @@ This project is **customized and tested for one device only** — the commercial
 |-------|------|---------|:---:|
 | **shuzhi-1.54tft-4g** (XiaoZhi CUBE 4G) | ESP32-S3 | ST7789 240×240 | ✅ [Releases](../../releases/latest) |
 
-> `main/boards/` still contains other board definitions inherited from
-> [xiaozhi-esp32](https://github.com/78/xiaozhi-esp32), but they are **not tested or
-> supported here** — this firmware targets the XiaoZhi CUBE 4G.
+> Built on the [xiaozhi-esp32](https://github.com/78/xiaozhi-esp32) board framework,
+> trimmed down to this one device.
 
 ## 🚀 Quick start
 
@@ -63,10 +62,9 @@ Needs [ESP-IDF](https://docs.espressif.com/projects/esp-idf/en/stable/) **v5.5.2
 Components download automatically on first build.
 ```bash
 . ~/esp/esp-idf/export.sh
-idf.py -DBOARD=shuzhi-1.54tft-4g set-target esp32s3
-idf.py -DBOARD=shuzhi-1.54tft-4g build flash monitor
+idf.py set-target esp32s3
+idf.py build flash monitor
 ```
-For other boards, swap the `-DBOARD=` name (see the table above).
 
 ## 🔗 Pair with Claude Desktop
 1. Open the **Hardware Buddy & Maker Devices** panel in Claude Desktop
@@ -125,7 +123,6 @@ main/
 - **[release/README.md](release/README.md)** — the flashing / release package.
 - **[SHUZHI-1.54TFT-4G-HARDWARE.md](SHUZHI-1.54TFT-4G-HARDWARE.md)** — full reverse-engineered
   hardware reference (pin map, battery ADC, BLE fixes, power-saving internals).
-- **[docs/ADDING_A_BOARD.md](docs/ADDING_A_BOARD.md)** — port to a new board.
 
 ## ⚖️ License & disclaimer
 MIT — see [LICENSE](LICENSE). This is an independent, community project. It is **not**

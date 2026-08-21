@@ -318,8 +318,8 @@ Tuned for this square panel (all flashed & confirmed on hardware):
 
 **Shared UI / app (affects all boards, guarded so others are unchanged)**
 - **Round-vs-rectangular layout** — added `Board::HasRoundDisplay()` (default
-  `false`). Round GC9A01 panels (cuican / moji / moji2 / lilygo-t-circle) override
-  it to `true` and keep the 40 px bezel-safe margins; rectangular panels use a
+  `false`, which the Shuzhi's rectangular ST7789 uses). Round panels could override
+  it to `true` for 40 px bezel-safe margins; the rectangular panel here uses a
   smaller margin and a full-height, spread-out layout in `buddy_ui.cc` (pet /
   status / clock no longer overlap; info-page hint pinned to the bottom).
 - **Multi-line status** — `TamaState::msg` enlarged 24→96 B; the rectangular
